@@ -239,7 +239,7 @@ export const FALLBACK_PROJECTS: Project[] = [
   },
   {
     id: "portfolio-editorial",
-    title: "Personal Portfolio 2026",
+    title: "My Portfolio",
     subtitle: "Editorial Luxury Digital Showcase",
     category: "Web Design & Creative UI/UX",
     year: "2026",
