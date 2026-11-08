@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <rect width="64" height="64" rx="16" fill="#11120F"/>
+  <circle cx="32" cy="32" r="28" stroke="#858D70" stroke-width="1.5" fill="#20231D"/>
+  <circle cx="32" cy="32" r="24" stroke="rgba(233,227,213,0.2)" stroke-width="0.75" fill="none"/>
+  <text x="32" y="38" font-family="'Playfair Display', 'Cormorant Garamond', Georgia, serif" font-size="20" font-weight="600" fill="#E9E3D5" text-anchor="middle" letter-spacing="-0.5">JJ</text>
+</svg>
