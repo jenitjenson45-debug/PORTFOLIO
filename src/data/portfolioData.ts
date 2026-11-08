@@ -254,7 +254,7 @@ export const FALLBACK_PROJECTS: Project[] = [
       { label: "Performance", value: "99+ Lighthouse" },
       { label: "Experience", value: "Smooth Scroll & Parallax" },
     ],
-    liveUrl: "https://jenitjenson.dev",
+    liveUrl: "https://portfolio-jenitjenson45-debug.vercel.app",
     githubUrl: "https://github.com/jenitjenson45-debug/PORTFOLIO",
     featured: true,
     accentColor: "#858D70",

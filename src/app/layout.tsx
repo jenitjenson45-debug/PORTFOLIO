@@ -4,7 +4,7 @@ import { SmoothScroll } from "@/components/effects/SmoothScroll";
 import { CustomCursor } from "@/components/cursor/CustomCursor";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://jenitjenson.dev"),
+  metadataBase: new URL("https://portfolio-jenitjenson45-debug.vercel.app"),
   title: "Jenit Jenson — Web Designer & UI/UX Designer",
   description:
     "Personal portfolio of Jenit Jenson: Web Designer and UI/UX Designer. Combining thoughtful aesthetics, intuitive interactions, and modern design systems.",
