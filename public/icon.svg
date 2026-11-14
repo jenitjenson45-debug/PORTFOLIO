@@ -1,0 +1,91 @@
+<svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- 24K Molten Gold Gradient -->
+    <linearGradient id="zaffranGoldGrad" x1="10%" y1="0%" x2="90%" y2="100%">
+      <stop offset="0%" stop-color="#FFF6E5" />
+      <stop offset="20%" stop-color="#F7D47A" />
+      <stop offset="45%" stop-color="#D99A43" />
+      <stop offset="75%" stop-color="#C76B35" />
+      <stop offset="100%" stop-color="#934D20" />
+    </linearGradient>
+
+    <!-- Golden Foil Border Gradient -->
+    <linearGradient id="zaffranBorderGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#8C4A1F" />
+      <stop offset="25%" stop-color="#D99A43" />
+      <stop offset="50%" stop-color="#FFEBB8" />
+      <stop offset="75%" stop-color="#D99A43" />
+      <stop offset="100%" stop-color="#8C4A1F" />
+    </linearGradient>
+
+    <!-- Radial Saffron Ember Backlight -->
+    <radialGradient id="zaffranCenterGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#D99A43" stop-opacity="0.38" />
+      <stop offset="50%" stop-color="#C76B35" stop-opacity="0.18" />
+      <stop offset="100%" stop-color="#120D0A" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <!-- Obsidian Tile Body -->
+  <rect width="120" height="120" rx="26" fill="#120D0A" />
+
+  <!-- Radial Core Ember Glow -->
+  <circle cx="60" cy="58" r="48" fill="url(#zaffranCenterGlow)" />
+
+  <!-- Outer 24K Gold Bezel -->
+  <rect x="3" y="3" width="114" height="114" rx="23" stroke="url(#zaffranBorderGrad)" stroke-width="2.5" />
+  
+  <!-- Inner Delicate Filigree Border -->
+  <rect x="7" y="7" width="106" height="106" rx="19" stroke="#D99A43" stroke-width="0.8" stroke-opacity="0.4" stroke-dasharray="2 3" />
+
+  <!-- Royal Coronet / Crown (y: 15 to 32) -->
+  <g fill="url(#zaffranGoldGrad)">
+    <!-- Crown Peaks -->
+    <path d="M 40 31 L 43 21 L 52 26 L 60 16 L 68 26 L 77 21 L 80 31 Z" />
+    <!-- Crown Base Band -->
+    <path d="M 39 32.5 C 48 34, 72 34, 81 32.5 L 81 34.5 C 72 36, 48 36, 39 34.5 Z" />
+    <!-- Crown Jewels / Pearls -->
+    <circle cx="60" cy="14" r="2.5" fill="#FFF6E5" />
+    <circle cx="43" cy="19" r="2" fill="#F7D47A" />
+    <circle cx="77" cy="19" r="2" fill="#F7D47A" />
+    <circle cx="52" cy="27.5" r="1.2" fill="#FFF6E5" />
+    <circle cx="68" cy="27.5" r="1.2" fill="#FFF6E5" />
+  </g>
+
+  <!-- Imperial "Z" Sculpted Monogram (y: 38 to 87) -->
+  <g fill="url(#zaffranGoldGrad)">
+    <!-- Chiseled Letter Z -->
+    <path d="
+      M 34 46.5
+      L 34 39
+      C 37 38.5, 42 38, 48 38
+      L 82 38
+      C 84 38, 86 39, 86 41
+      L 86 46
+      L 51.5 83
+      L 76 83
+      C 82 83, 85 82.5, 86 77
+      L 86 86
+      C 82 86.5, 76 87, 68 87
+      L 34 87
+      C 32 87, 30 86, 30 84
+      L 30 79
+      L 67.5 42
+      L 45 42
+      C 38 42, 35 42.5, 34 46.5
+      Z
+    " />
+  </g>
+
+  <!-- Crossed Culinary Scepters / Utensils Silhouette at Base (y: 93 to 102) -->
+  <g stroke="url(#zaffranGoldGrad)" stroke-width="2" stroke-linecap="round">
+    <line x1="44" y1="99" x2="76" y2="93" />
+    <line x1="76" y1="99" x2="44" y2="93" />
+  </g>
+  <!-- Center Golden Diamond Sparkle at Crossed Base -->
+  <path d="M 60 92 L 62.5 96 L 60 100 L 57.5 96 Z" fill="#FFF6E5" />
+
+  <!-- Ambient Royal Sparkles -->
+  <path d="M 88 28 L 89.5 31.5 L 93 33 L 89.5 34.5 L 88 38 L 86.5 34.5 L 83 33 L 86.5 31.5 Z" fill="#FFF6E5" opacity="0.9" />
+  <path d="M 28 68 L 29.5 70.5 L 32 72 L 29.5 73.5 L 28 76 L 26.5 73.5 L 24 72 L 26.5 70.5 Z" fill="#F7D47A" opacity="0.8" />
+</svg>

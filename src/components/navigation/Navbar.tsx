@@ -1,198 +1,437 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Monogram } from "../common/Monogram";
-import { PERSONAL_INFO } from "@/data/portfolioData";
-import { Menu, X, ArrowUpRight } from "lucide-react";
+import Link from "next/link";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
+import {
+  ShoppingBag,
+  User,
+  Search,
+  Menu,
+  X,
+  Sparkles,
+  UtensilsCrossed,
+  PhoneCall,
+  Clock,
+  ShieldCheck,
+  ArrowRight,
+} from "lucide-react";
+import { useCart } from "@/context/CartContext";
+import { FoodItem } from "@/lib/types";
 
-const NAV_LINKS = [
-  { name: "Home", href: "#home" },
-  { name: "About", href: "#about" },
-  { name: "Services", href: "#services" },
-  { name: "Work", href: "#work" },
-  { name: "Contact", href: "#contact" },
-];
-
-export const Navbar: React.FC = () => {
+export function Navbar() {
+  const pathname = usePathname();
+  const { itemCount } = useCart();
+  const [scrollY, setScrollY] = useState(0);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [activeSection, setActiveSection] = useState("home");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchModalOpen, setSearchModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchingLive, setIsSearchingLive] = useState(false);
+  const [allDishes, setAllDishes] = useState<FoodItem[]>([]);
+  const [searchResults, setSearchResults] = useState<FoodItem[]>([]);
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 30);
-
-      // Detect current section in view
-      const sections = NAV_LINKS.map((link) => link.href.substring(1));
-      const scrollPosition = window.scrollY + 220;
-
-      for (const section of sections) {
-        const el = document.getElementById(section);
-        if (el) {
-          const top = el.offsetTop;
-          const height = el.offsetHeight;
-          if (scrollPosition >= top && scrollPosition < top + height) {
-            setActiveSection(section);
-            break;
-          }
-        }
-      }
+      const y = window.scrollY;
+      setScrollY(y);
+      setIsScrolled(y > 20);
     };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
-
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    e.preventDefault();
-    const targetId = href.replace("#", "");
-    const targetEl = document.getElementById(targetId);
-
-    if (targetEl) {
-      setMobileMenuOpen(false);
-      const win = window as unknown as { lenis?: { scrollTo: (target: HTMLElement | string) => void } };
-      if (win.lenis) {
-        win.lenis.scrollTo(targetEl);
-      } else {
-        targetEl.scrollIntoView({ behavior: "smooth" });
-      }
+  // Fetch dishes for live instant search when modal opens
+  useEffect(() => {
+    if (searchModalOpen && allDishes.length === 0) {
+      fetch("/api/menu")
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success && data.items) {
+            setAllDishes(data.items);
+          }
+        })
+        .catch(() => {});
     }
-  };
+  }, [searchModalOpen, allDishes.length]);
+
+  // Live filter with pulsing search progress
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      setIsSearchingLive(false);
+      return;
+    }
+
+    setIsSearchingLive(true);
+    const timer = setTimeout(() => {
+      const q = searchQuery.toLowerCase().trim();
+      const matches = allDishes.filter(
+        (d) =>
+          d.name.toLowerCase().includes(q) ||
+          d.description.toLowerCase().includes(q) ||
+          d.categoryName.toLowerCase().includes(q)
+      );
+      setSearchResults(matches);
+      setIsSearchingLive(false);
+    }, 240);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery, allDishes]);
+
+  // Close mobile drawer on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+    setSearchModalOpen(false);
+  }, [pathname]);
+
+  const navLinks = [
+    { name: "Home", href: "/" },
+    { name: "Menu", href: "/menu" },
+    { name: "About", href: "/about" },
+    { name: "Offers", href: "/#offers" },
+    { name: "Gallery", href: "/#gallery" },
+    { name: "Contact", href: "/contact" },
+  ];
+
+  const isHomePage = pathname === "/";
+  // On home page, smoothly reveal navbar as user scrolls past the 3D zoom intro
+  const showNavbar = !isHomePage || scrollY > 260;
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 py-4 sm:py-6 px-4 sm:px-8 transition-all duration-500 pointer-events-none">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          {/* Left: Monogram JJ & Name in compact glass pill */}
-          <motion.a
-            href="#home"
-            onClick={(e) => handleNavClick(e, "#home")}
-            initial={{ opacity: 0, y: -15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            className="pointer-events-auto group flex items-center gap-3 px-3.5 py-2 rounded-full glass-nav hover:border-[#858D70]/50 transition-all duration-300"
-          >
-            <Monogram size="sm" />
-            <div className="flex flex-col pr-1">
-              <span className="font-editorial-serif text-sm tracking-[0.14em] uppercase text-[#E9E3D5] group-hover:text-[#F5F3EC] transition-colors">
-                {PERSONAL_INFO.name}
-              </span>
-              <span className="text-[8.5px] tracking-[0.24em] uppercase text-[#A9A99D] font-sans">
-                PORTFOLIO 2026
-              </span>
+      <header
+        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 ${
+          showNavbar
+            ? "translate-y-0 opacity-100 pointer-events-auto"
+            : "-translate-y-full opacity-0 pointer-events-none"
+        } ${
+          isScrolled
+            ? "bg-[#17110E]/90 backdrop-blur-xl border-b border-[#D99A43]/20 py-3 shadow-2xl shadow-black/50"
+            : "bg-gradient-to-b from-black/80 via-black/40 to-transparent py-5"
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between">
+            {/* Brand Logo & Name */}
+            <Link href="/" className="flex items-center gap-3 group">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#D99A43] via-[#C76B35] to-[#A66E22] flex items-center justify-center p-0.5 shadow-lg shadow-[#D99A43]/25 group-hover:scale-105 transition-transform">
+                <div className="w-full h-full bg-[#17110E] rounded-[10px] flex items-center justify-center">
+                  <UtensilsCrossed className="w-5 h-5 text-[#D99A43]" />
+                </div>
+              </div>
+              <div className="flex flex-col">
+                <span className="font-serif-luxury text-2xl font-black tracking-widest text-[#FFF4E5] group-hover:text-[#D99A43] transition-colors leading-none">
+                  ZAFFRAN
+                </span>
+                <span className="text-[10px] uppercase tracking-[0.25em] text-[#D8C4A8] font-medium leading-tight mt-0.5">
+                  The Grand Pavilion
+                </span>
+              </div>
+            </Link>
+
+            {/* Desktop Navigation Links — Claymorphic UI Design */}
+            <nav className="hidden lg:flex items-center gap-2 p-1 rounded-full bg-[#17110E]/70 backdrop-blur-md border border-[#D99A43]/25 shadow-inner">
+              {navLinks.map((link) => {
+                const isActive = pathname === link.href;
+                return (
+                  <Link
+                    key={link.name}
+                    href={link.href}
+                    className={`clay-btn-nav ${
+                      isActive ? "clay-btn-nav-active" : "clay-btn-nav-inactive"
+                    }`}
+                  >
+                    <span>{link.name}</span>
+                  </Link>
+                );
+              })}
+            </nav>
+
+            {/* Right Action Icons & Buttons */}
+            <div className="flex items-center gap-2 sm:gap-4">
+              {/* Search Trigger */}
+              <button
+                type="button"
+                onClick={() => setSearchModalOpen(true)}
+                className="p-2.5 rounded-xl bg-white/5 border border-white/10 hover:border-[#D99A43]/50 text-[#FFF4E5] hover:text-[#D99A43] transition-colors"
+                aria-label="Search Menu"
+              >
+                <Search className="w-4 h-4" />
+              </button>
+
+              {/* Customer Account */}
+              <Link
+                href="/account"
+                className="p-2.5 rounded-xl bg-white/5 border border-white/10 hover:border-[#D99A43]/50 text-[#FFF4E5] hover:text-[#D99A43] transition-colors"
+                aria-label="Customer Profile & Orders"
+              >
+                <User className="w-4 h-4" />
+              </Link>
+
+              {/* Shopping Cart with Live Badge Counter */}
+              <Link
+                href="/cart"
+                className="relative p-2.5 rounded-xl bg-white/5 border border-white/10 hover:border-[#D99A43]/50 text-[#FFF4E5] hover:text-[#D99A43] transition-colors"
+                aria-label="View Shopping Cart"
+              >
+                <ShoppingBag className="w-4 h-4" />
+                {itemCount > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-gradient-to-r from-[#D99A43] to-[#C76B35] text-[#17110E] text-[11px] font-extrabold flex items-center justify-center shadow-lg shadow-[#D99A43]/40 animate-pulse">
+                    {itemCount}
+                  </span>
+                )}
+              </Link>
+
+              {/* Admin Portal Shortcut */}
+              <Link
+                href="/admin"
+                className="hidden xl:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#24201D] border border-[#D99A43]/30 text-xs font-semibold text-[#D8C4A8] hover:text-[#D99A43] hover:border-[#D99A43] transition-colors"
+                title="Restaurant Admin Dashboard"
+              >
+                <ShieldCheck className="w-3.5 h-3.5 text-[#D99A43]" />
+                <span>Admin</span>
+              </Link>
+
+              {/* Order Now CTA Button — Skeuomorphic Gold Ingot */}
+              <Link
+                href="/menu"
+                className="btn-skeuomorphic-gold hidden sm:inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-black text-xs uppercase tracking-wider"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-[#17110E]" />
+                <span>Order Now</span>
+              </Link>
+
+              {/* Mobile Hamburger Toggle */}
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="lg:hidden p-2.5 rounded-xl bg-white/5 border border-white/10 text-[#FFF4E5] hover:text-[#D99A43]"
+                aria-label="Toggle navigation menu"
+              >
+                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
             </div>
-          </motion.a>
-
-          {/* Middle: Floating Glassmorphism Center Pill (Desktop) */}
-          <motion.nav
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-            className="pointer-events-auto hidden md:flex items-center gap-1 px-3 py-1.5 rounded-full glass-nav shadow-2xl shadow-black/60"
-          >
-            {NAV_LINKS.map((link) => {
-              const isActive = activeSection === link.href.substring(1);
-              return (
-                <a
-                  key={link.name}
-                  href={link.href}
-                  onClick={(e) => handleNavClick(e, link.href)}
-                  className={`relative px-4 py-2 text-xs uppercase tracking-[0.2em] font-sans transition-all duration-300 rounded-full ${
-                    isActive
-                      ? "text-[#E9E3D5] font-medium"
-                      : "text-[#A9A99D] hover:text-[#E9E3D5] hover:bg-[#20231D]/40"
-                  }`}
-                >
-                  {/* Olive Green Active Indicator Pill */}
-                  {isActive && (
-                    <motion.div
-                      layoutId="activeNavIndicator"
-                      className="absolute inset-0 bg-[#858D70]/25 border border-[#858D70]/40 rounded-full -z-10 shadow-[0_0_12px_rgba(133,141,112,0.3)]"
-                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                    />
-                  )}
-                  {link.name}
-                </a>
-              );
-            })}
-          </motion.nav>
-
-          {/* Right: Availability Indicator & Let's Talk Button */}
-          <motion.div
-            initial={{ opacity: 0, y: -15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="pointer-events-auto flex items-center gap-3"
-          >
-            {/* Small Animated Availability Indicator */}
-            <div className="hidden lg:flex items-center gap-2 px-3 py-2 rounded-full glass-nav text-[10px] uppercase tracking-[0.2em] text-[#A9A99D]">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#858D70] opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#858D70]" />
-              </span>
-              <span>Available</span>
-            </div>
-
-            {/* Let's Talk Button */}
-            <a
-              href="#contact"
-              onClick={(e) => handleNavClick(e, "#contact")}
-              className="group relative inline-flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-full bg-[#20231D] border border-[rgba(233,227,213,0.18)] hover:border-[#858D70] hover:bg-[#858D70]/20 text-[#E9E3D5] hover:text-[#F5F3EC] text-xs uppercase tracking-[0.2em] font-medium transition-all duration-300 shadow-lg shadow-black/40"
-            >
-              <span>Let&apos;s Talk</span>
-              <ArrowUpRight className="w-3.5 h-3.5 text-[#858D70] group-hover:text-[#E9E3D5] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-            </a>
-
-            {/* Mobile Menu Toggle Button */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2.5 rounded-full glass-nav text-[#E9E3D5] focus:outline-none"
-              aria-label="Toggle menu"
-            >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
-          </motion.div>
+          </div>
         </div>
       </header>
 
       {/* Mobile Drawer Menu */}
-      <AnimatePresence>
-        {mobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-x-4 top-20 z-40 p-6 rounded-2xl glass-panel md:hidden border border-[rgba(233,227,213,0.16)] shadow-2xl"
-          >
-            <div className="flex flex-col gap-3">
-              {NAV_LINKS.map((link) => (
-                <a
-                  key={link.name}
-                  href={link.href}
-                  onClick={(e) => handleNavClick(e, link.href)}
-                  className={`px-4 py-3 rounded-xl text-sm uppercase tracking-[0.2em] transition-colors ${
-                    activeSection === link.href.substring(1)
-                      ? "bg-[#858D70]/25 text-[#E9E3D5] border border-[#858D70]/40 font-medium"
-                      : "text-[#A9A99D] hover:text-[#E9E3D5] hover:bg-[#20231D]"
-                  }`}
-                >
-                  {link.name}
-                </a>
-              ))}
-              <div className="pt-3 mt-2 border-t border-[rgba(233,227,213,0.1)] flex items-center justify-between text-xs text-[#A9A99D]">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-[#858D70] animate-pulse" />
-                  <span>Available for freelance & projects</span>
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-30 lg:hidden animate-in fade-in duration-200">
+          <div
+            className="fixed inset-0 bg-black/80 backdrop-blur-md"
+            onClick={() => setMobileMenuOpen(false)}
+          />
+          <div className="fixed top-0 right-0 bottom-0 w-4/5 max-w-sm bg-[#1C1815] border-l border-[#D99A43]/30 p-6 flex flex-col justify-between shadow-2xl z-40 overflow-y-auto">
+            <div className="space-y-6 pt-16">
+              <div className="flex items-center gap-3 pb-6 border-b border-[#D99A43]/20">
+                <div className="w-10 h-10 rounded-xl bg-[#D99A43] flex items-center justify-center text-[#17110E]">
+                  <UtensilsCrossed className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-serif-luxury text-xl font-bold text-[#FFF4E5]">ZAFFRAN</h3>
+                  <p className="text-[10px] text-[#D8C4A8] tracking-widest uppercase">The Grand Pavilion</p>
                 </div>
               </div>
+
+              <nav className="flex flex-col space-y-2.5">
+                {navLinks.map((link) => {
+                  const isActive = pathname === link.href;
+                  return (
+                    <Link
+                      key={link.name}
+                      href={link.href}
+                      className={`clay-btn-nav w-full justify-start text-left text-sm py-3 px-4 ${
+                        isActive ? "clay-btn-nav-active" : "clay-btn-nav-inactive"
+                      }`}
+                    >
+                      {link.name}
+                    </Link>
+                  );
+                })}
+                <Link
+                  href="/account"
+                  className="clay-btn-nav clay-btn-nav-inactive w-full justify-start text-left text-sm py-3 px-4"
+                >
+                  My Account & Orders
+                </Link>
+                <Link
+                  href="/admin"
+                  className="clay-btn-nav clay-btn-nav-inactive w-full justify-start text-left text-xs py-2.5 px-4 text-[#D99A43] flex items-center gap-2"
+                >
+                  <ShieldCheck className="w-4 h-4 text-[#D99A43]" /> Admin Dashboard
+                </Link>
+              </nav>
+
+              <div className="pt-4">
+                <Link
+                  href="/menu"
+                  className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-gradient-to-r from-[#D99A43] to-[#C76B35] text-[#17110E] font-bold text-sm uppercase tracking-wider shadow-lg shadow-[#D99A43]/25"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  <span>Start Online Order</span>
+                </Link>
+              </div>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+
+            <div className="pt-6 border-t border-white/10 text-xs text-[#9D8F82] space-y-2">
+              <div className="flex items-center gap-2">
+                <Clock className="w-3.5 h-3.5 text-[#D99A43]" />
+                <span>Open: 11:00 AM – 12:30 AM Daily</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <PhoneCall className="w-3.5 h-3.5 text-[#D99A43]" />
+                <a href="tel:+919072104475" className="hover:text-[#FFF4E5] font-medium">+91 90721 04475</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Global Interactive Search Modal with Pulsing Skeletons & Live Preview */}
+      {searchModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200"
+          onClick={() => setSearchModalOpen(false)}
+        >
+          <div
+            className="w-full max-w-2xl bg-[#24201D] border border-[#D99A43]/40 rounded-2xl p-6 shadow-2xl relative text-[#FFF4E5] overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setSearchModalOpen(false)}
+              className="absolute top-4 right-4 p-2 text-[#9D8F82] hover:text-white"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="flex items-center gap-2 mb-3">
+              <Sparkles className="w-4 h-4 text-[#D99A43]" />
+              <h3 className="font-serif-luxury text-xl font-bold text-[#FFF4E5]">
+                Search Pavilion Menu
+              </h3>
+            </div>
+
+            {/* Input with Scanning Beam */}
+            <div className="relative rounded-xl overflow-hidden bg-[#17110E] border border-[#D99A43]/30 focus-within:border-[#D99A43] shadow-inner">
+              <input
+                type="text"
+                autoFocus
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Type a dish, cuisine, or ingredient (e.g. Mutton Mandi, Biryani, Falooda)..."
+                className="w-full bg-transparent py-3.5 pl-11 pr-10 text-sm text-[#FFF4E5] placeholder-[#9D8F82] focus:outline-none"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && searchQuery.trim()) {
+                    setSearchModalOpen(false);
+                    window.location.href = `/menu?search=${encodeURIComponent(searchQuery)}`;
+                  }
+                }}
+              />
+              <Search className={`w-4 h-4 absolute left-3.5 top-4 transition-colors ${isSearchingLive ? "text-[#D99A43] animate-pulse" : "text-[#D99A43]/60"}`} />
+
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-3.5 top-3.5 text-[#9D8F82] hover:text-white"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+
+              {/* Animated Gold Progress Scanning Line */}
+              {isSearchingLive && <div className="search-scan-line w-full" />}
+            </div>
+
+            {/* LIVE RESULTS / PULSING PLACEHOLDER SKELETONS */}
+            <div className="mt-4 max-h-72 overflow-y-auto space-y-2">
+              {isSearchingLive ? (
+                /* Pulsing Search Row Placeholders */
+                <div className="space-y-2 py-2">
+                  <div className="text-[11px] text-[#D99A43] flex items-center gap-1.5 pb-1 font-semibold uppercase tracking-wider">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#D99A43] animate-ping" />
+                    <span>Searching across kitchen stations...</span>
+                  </div>
+                  {[1, 2, 3].map((n) => (
+                    <div
+                      key={n}
+                      className="p-3 rounded-xl bg-[#1D1916] border border-white/5 flex items-center gap-3.5 animate-pulse"
+                    >
+                      <div className="w-12 h-12 rounded-lg bg-white/10 placeholder-shimmer shrink-0" />
+                      <div className="flex-1 space-y-2">
+                        <div className="h-4 w-3/5 rounded bg-white/10 placeholder-shimmer" />
+                        <div className="h-3 w-2/5 rounded bg-white/5" />
+                      </div>
+                      <div className="h-6 w-14 rounded-lg bg-[#D99A43]/20 placeholder-shimmer" />
+                    </div>
+                  ))}
+                </div>
+              ) : searchQuery.trim() && searchResults.length > 0 ? (
+                /* Instant Matched Delicacies */
+                <div className="space-y-1.5 pt-1">
+                  <div className="text-[11px] text-[#9D8F82] pb-1 flex justify-between items-center">
+                    <span>Found {searchResults.length} matches:</span>
+                    <span className="text-[10px] text-[#D99A43]">Click to view on menu</span>
+                  </div>
+                  {searchResults.slice(0, 5).map((dish) => (
+                    <Link
+                      key={dish.id}
+                      href={`/menu?search=${encodeURIComponent(dish.name)}`}
+                      onClick={() => setSearchModalOpen(false)}
+                      className="group p-2.5 rounded-xl bg-[#1D1916] border border-white/5 hover:border-[#D99A43]/50 hover:bg-[#2A2420] transition-all flex items-center justify-between gap-3"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="relative w-11 h-11 rounded-lg overflow-hidden shrink-0 bg-[#17110E]">
+                          <Image src={dish.image} alt={dish.name} fill className="object-cover" />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className={`w-1.5 h-1.5 rounded-full ${dish.isVeg ? "bg-[#6F8D57]" : "bg-[#C76B35]"}`} />
+                            <h4 className="font-serif-luxury text-sm font-bold text-[#FFF4E5] group-hover:text-[#D99A43] transition-colors">
+                              {dish.name}
+                            </h4>
+                          </div>
+                          <span className="text-[10px] text-[#9D8F82]">{dish.categoryName}</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs font-bold text-[#D99A43]">₹{dish.price}</span>
+                        <ArrowRight className="w-3.5 h-3.5 text-[#9D8F82] group-hover:text-white group-hover:translate-x-0.5 transition-all" />
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              ) : searchQuery.trim() && !isSearchingLive ? (
+                <div className="py-6 text-center text-xs text-[#9D8F82]">
+                  No matching dishes found. Try &ldquo;Mandi&rdquo;, &ldquo;Biryani&rdquo;, or &ldquo;Falooda&rdquo;.
+                </div>
+              ) : null}
+            </div>
+
+            {/* Quick Keyword Pills */}
+            <div className="mt-4 pt-3 border-t border-white/5 flex flex-wrap gap-1.5 text-xs">
+              <span className="text-[#9D8F82] py-1 text-[11px]">Popular:</span>
+              {["Royal Mutton Mandi", "Thalassery Biryani", "Special Falooda", "Dynamite Shrimps", "Blue Lagoon"].map(
+                (term) => (
+                  <button
+                    key={term}
+                    onClick={() => {
+                      setSearchQuery(term);
+                    }}
+                    className="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 hover:border-[#D99A43] hover:text-[#D99A43] transition-colors text-[11px]"
+                  >
+                    {term}
+                  </button>
+                )
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
-};
+}

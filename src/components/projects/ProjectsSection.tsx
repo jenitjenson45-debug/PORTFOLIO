@@ -1,269 +1,157 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
-import { FALLBACK_PROJECTS, Project, PERSONAL_INFO } from "@/data/portfolioData";
-import {
-  ResqlinkVisual,
-  RoyalFoodsVisual,
-  EditorialVisual,
-  AegisVisual,
-} from "./ProjectVisuals";
+import { FEATURED_PROJECTS, Project } from "@/data/portfolioData";
 import { ProjectModal } from "./ProjectModal";
-import { ExternalLink, Github, ArrowUpRight, Sparkles, RefreshCw } from "lucide-react";
+import { Starburst } from "../common/Monogram";
+import { ArrowRight, ExternalLink, Github, Sparkles } from "lucide-react";
 
 export const ProjectsSection: React.FC = () => {
-  const [projects, setProjects] = useState<Project[]>(FALLBACK_PROJECTS);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const [isLoadingGithub, setIsLoadingGithub] = useState(false);
-  const [githubLoaded, setGithubLoaded] = useState(false);
-
-  // Dynamic GitHub Integration
-  useEffect(() => {
-    const fetchGithubRepos = async () => {
-      try {
-        setIsLoadingGithub(true);
-        const res = await fetch(
-          "https://api.github.com/users/jenitjenson45-debug/repos?sort=updated&per_page=100",
-          {
-            headers: {
-              Accept: "application/vnd.github.v3+json",
-            },
-          }
-        );
-
-        if (!res.ok) {
-          // If rate-limited or error, fallback projects are already in place
-          return;
-        }
-
-        const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) {
-          // Map and merge with our curated project showcase
-          const updatedProjects = FALLBACK_PROJECTS.map((fallback) => {
-            const match = data.find(
-              (r) =>
-                r.name.toLowerCase() === fallback.id.toLowerCase() ||
-                r.html_url.toLowerCase() === fallback.githubUrl.toLowerCase() ||
-                r.name.toLowerCase().includes(fallback.id.toLowerCase())
-            );
-
-            if (match) {
-              return {
-                ...fallback,
-                description: match.description || fallback.description,
-                githubUrl: match.html_url || fallback.githubUrl,
-                tags: match.language
-                  ? Array.from(new Set([match.language, ...fallback.tags]))
-                  : fallback.tags,
-                year: match.updated_at
-                  ? new Date(match.updated_at).getFullYear().toString()
-                  : fallback.year,
-              };
-            }
-            return fallback;
-          });
-
-          setProjects(updatedProjects);
-          setGithubLoaded(true);
-        }
-      } catch {
-        // Offline or sandbox network limit — fallback remains smoothly active
-      } finally {
-        setIsLoadingGithub(false);
-      }
-    };
-
-    fetchGithubRepos();
-  }, []);
-
-  const renderVisual = (id: string) => {
-    switch (id) {
-      case "resqlink":
-        return <ResqlinkVisual />;
-      case "royal-foods":
-        return <RoyalFoodsVisual />;
-      case "portfolio-editorial":
-        return <EditorialVisual />;
-      case "aegis-platform":
-        return <AegisVisual />;
-      default:
-        return <ResqlinkVisual />;
-    }
-  };
 
   return (
     <section
-      id="work"
-      className="relative min-h-screen py-24 sm:py-32 px-6 md:px-12 lg:px-16 overflow-hidden bg-[#11120F] flex flex-col justify-center"
+      id="projects"
+      className="relative min-h-screen py-24 sm:py-32 px-6 sm:px-12 lg:px-16 bg-[#080808] text-[#F5F1E9] flex flex-col justify-center overflow-hidden border-t border-[rgba(214,180,119,0.08)]"
     >
-      {/* Background Glow */}
-      <div className="absolute top-1/4 left-1/4 w-[700px] h-[700px] bg-[#858D70]/10 rounded-full blur-[180px] pointer-events-none" />
+      {/* Background Ambient Glow */}
+      <div className="absolute top-1/3 left-1/4 w-[650px] h-[650px] bg-[radial-gradient(circle,rgba(214,180,119,0.12)_0%,rgba(158,126,69,0.03)_50%,transparent_75%)] blur-[180px] pointer-events-none" />
 
-      <div className="relative z-10 max-w-7xl w-full mx-auto">
-        {/* Section Header Bar */}
-        <div className="flex items-center gap-3 mb-6">
-          <span className="text-[#858D70] font-editorial-serif text-sm italic">04</span>
-          <span className="w-8 h-[1px] bg-[#858D70]/60" />
-          <span className="text-xs uppercase tracking-[0.28em] text-[#A0AA87] font-sans font-medium">
-            PORTFOLIO SHOWCASE
-          </span>
-        </div>
+      <div className="relative z-10 max-w-7xl mx-auto w-full">
+        {/* Header matching Screenshot 2 */}
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-16">
+          <div className="max-w-xl">
+            {/* Section Index Tag */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="flex items-center gap-2.5 text-xs tracking-[0.24em] uppercase text-[#AAA59D] mb-4"
+            >
+              <span className="text-[#F0D5A5] font-serif font-semibold">03</span>
+              <span className="text-[#AAA59D]/50">/</span>
+              <span>My Projects</span>
+            </motion.div>
 
-        {/* Section Title & Subtitle (Image 02 Language) */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16 md:mb-20">
-          <div>
+            {/* Heading: Projects That Speak. */}
             <motion.h2
               initial={{ opacity: 0, y: 25 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="font-condensed text-6xl sm:text-7xl md:text-8xl lg:text-9xl text-[#E9E3D5] leading-[0.88] tracking-tight uppercase"
+              transition={{ duration: 0.7 }}
+              className="font-serif-luxury text-4xl sm:text-5xl lg:text-6xl font-medium leading-[1.08] text-[#F5F1E9]"
             >
-              SELECTED WORK.
+              Projects <br />
+              That <span className="text-gold-gradient italic font-normal">Speak.</span>
             </motion.h2>
-            <p className="mt-4 text-[#A9A99D] text-base sm:text-lg font-sans max-w-2xl font-light">
-              A collection of digital experiences, experiments and projects shaped by
-              curiosity, creativity and technology.
-            </p>
-          </div>
 
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            {githubLoaded && (
-              <span className="text-[10px] uppercase tracking-[0.2em] text-[#858D70] flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#20231D] border border-[#858D70]/30">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#858D70] animate-pulse" />
-                Live GitHub Synced
-              </span>
-            )}
-            <a
-              href="https://github.com/jenitjenson45-debug?tab=repositories"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.24em] text-[#E9E3D5] hover:text-[#858D70] transition-colors pb-1.5 border-b border-[#858D70]/40 group"
-            >
-              <span>VIEW ALL PROJECTS</span>
-              <ArrowUpRight className="w-3.5 h-3.5 text-[#858D70] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-            </a>
-          </div>
-        </div>
-
-        {/* Editorial Project Gallery Grid (3-column on desktop, responsive) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-          {projects.map((project, index) => (
-            <motion.div
-              key={project.id}
-              initial={{ opacity: 0, y: 30 }}
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: index * 0.12, duration: 0.8 }}
-              className="group flex flex-col justify-between p-6 sm:p-7 rounded-2xl glass-card border border-[rgba(233,227,213,0.12)] hover:border-[#858D70]/60 transition-all duration-500 overflow-hidden"
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="mt-4 text-sm sm:text-base text-[#AAA59D] font-light"
             >
-              <div>
-                {/* Visual Preview Container */}
-                <div
-                  onClick={() => setSelectedProject(project)}
-                  className="relative w-full aspect-[4/3] rounded-xl overflow-hidden cursor-pointer mb-6 group-hover:shadow-2xl transition-all duration-500"
-                >
-                  <div className="w-full h-full transform transition-transform duration-700 ease-out group-hover:scale-105">
-                    {renderVisual(project.id)}
-                  </div>
+              A showcase of my creative and development work, from disaster management platforms to modern web experiences.
+            </motion.p>
+          </div>
 
-                  {/* Gentle Image Overlay on Hover */}
-                  <div className="absolute inset-0 bg-[#11120F]/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                    <span className="px-4 py-2 rounded-full glass-panel text-xs uppercase tracking-[0.2em] text-[#E9E3D5] font-medium border border-[#858D70]/40">
-                      EXPLORE DETAILS
-                    </span>
-                  </div>
-                </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <a
+              href="https://github.com/jenitjenson45-debug"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-xs sm:text-sm text-[#F0D5A5] hover:text-white transition-colors pb-1 border-b border-[rgba(214,180,119,0.3)] hover:border-[#D6B477]"
+            >
+              <span>View All Projects on GitHub</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </a>
+          </motion.div>
+        </div>
 
-                {/* Category & Year */}
-                <div className="flex items-center justify-between mb-3 text-[10px] uppercase tracking-[0.24em] text-[#A0AA87]">
-                  <span>{project.category}</span>
-                  <span className="text-[#A9A99D] font-mono">{project.year}</span>
-                </div>
+        {/* 3 Large Cinematic Project Cards Grid (Matching Screenshot 2) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {FEATURED_PROJECTS.map((project, index) => (
+            <motion.div
+              key={project.id}
+              initial={{ opacity: 0, y: 35 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7, delay: index * 0.15 }}
+              onClick={() => setSelectedProject(project)}
+              data-cursor-project="true"
+              className="group relative rounded-3xl overflow-hidden glass-card-interactive border border-[rgba(214,180,119,0.18)] cursor-pointer flex flex-col justify-between"
+            >
+              {/* Card Image Thumbnail Layer */}
+              <div className="relative aspect-[16/10] w-full overflow-hidden bg-[#12110E]">
+                <Image
+                  src={project.image}
+                  alt={project.title}
+                  fill
+                  className="object-cover opacity-85 group-hover:scale-105 group-hover:opacity-100 transition-all duration-700 ease-out"
+                />
 
-                {/* Project Title */}
-                <h3
-                  onClick={() => setSelectedProject(project)}
-                  className="font-condensed text-3xl sm:text-4xl text-[#E9E3D5] group-hover:text-[#F5F3EC] tracking-wide mb-2 uppercase cursor-pointer transition-colors"
-                >
-                  {project.title}
-                </h3>
+                {/* Subtle dark gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#080808] via-transparent to-transparent opacity-90" />
 
-                {/* Short Description */}
-                <p className="text-xs sm:text-sm text-[#A9A99D] font-sans font-light leading-relaxed line-clamp-3 mb-6">
-                  {project.description}
-                </p>
-
-                {/* Technology Labels */}
-                <div className="flex flex-wrap gap-1.5 mb-6">
-                  {project.tags.slice(0, 4).map((tag) => (
-                    <span
-                      key={tag}
-                      className="px-2.5 py-1 text-[10px] rounded-full bg-[#20231D] text-[#E9E3D5] font-sans border border-[rgba(233,227,213,0.08)]"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                  {project.tags.length > 4 && (
-                    <span className="px-2 py-1 text-[10px] rounded-full bg-[#20231D] text-[#A9A99D] font-sans">
-                      +{project.tags.length - 4}
-                    </span>
-                  )}
+                {/* Top Corner Pill Tag */}
+                <div className="absolute top-4 left-4 z-10 px-3 py-1 rounded-full bg-[#080808]/80 backdrop-blur-md border border-[rgba(214,180,119,0.25)] text-[10px] tracking-wider uppercase text-[#F0D5A5] font-mono">
+                  {`PROJECT 0${index + 1}`}
                 </div>
               </div>
 
-              {/* Action Buttons Row */}
-              <div className="pt-4 border-t border-[rgba(233,227,213,0.08)] flex items-center justify-between">
-                <button
-                  onClick={() => setSelectedProject(project)}
-                  className="text-xs uppercase tracking-[0.2em] text-[#858D70] hover:text-[#E9E3D5] font-medium transition-colors"
-                >
-                  VIEW PROJECT
-                </button>
+              {/* Card Body */}
+              <div className="p-6 sm:p-7 flex flex-col flex-1 justify-between">
+                <div>
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-serif-luxury text-2xl sm:text-3xl text-[#F5F1E9] group-hover:text-[#F0D5A5] transition-colors font-medium">
+                      {project.title}
+                    </h3>
+                    <div className="w-9 h-9 rounded-full border border-[rgba(214,180,119,0.3)] bg-[#141311] flex items-center justify-center transition-all duration-300 group-hover:border-[#D6B477] group-hover:scale-110 group-hover:bg-[#D6B477] group-hover:text-[#080808]">
+                      <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5" />
+                    </div>
+                  </div>
 
-                <div className="flex items-center gap-3">
-                  {project.liveUrl && (
-                    <a
-                      href={project.liveUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-2 rounded-full bg-[#20231D] hover:bg-[#858D70] text-[#A9A99D] hover:text-[#11120F] transition-colors"
-                      title="Open Live Preview"
+                  <p className="text-xs uppercase tracking-[0.16em] text-[#AAA59D] font-mono mt-1 mb-3">
+                    {project.subtitle}
+                  </p>
+
+                  <p className="text-xs sm:text-sm text-[#AAA59D] leading-relaxed line-clamp-3 font-light">
+                    {project.description}
+                  </p>
+                </div>
+
+                {/* Technologies List */}
+                <div className="mt-6 pt-4 border-t border-[rgba(255,255,255,0.06)] flex flex-wrap gap-1.5">
+                  {project.technologies.slice(0, 3).map((tech) => (
+                    <span
+                      key={tech}
+                      className="text-[10px] px-2.5 py-0.5 rounded-full bg-[#161512] text-[#AAA59D] border border-[rgba(214,180,119,0.12)] font-mono"
                     >
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    </a>
+                      {tech}
+                    </span>
+                  ))}
+                  {project.technologies.length > 3 && (
+                    <span className="text-[10px] px-2 py-0.5 rounded-full text-[#F0D5A5]/80 font-mono">
+                      +{project.technologies.length - 3}
+                    </span>
                   )}
-                  <a
-                    href={project.githubUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-2 rounded-full bg-[#20231D] hover:bg-[#858D70] text-[#A9A99D] hover:text-[#11120F] transition-colors"
-                    title="Open GitHub Repository"
-                  >
-                    <Github className="w-3.5 h-3.5" />
-                  </a>
                 </div>
               </div>
             </motion.div>
           ))}
         </div>
-
-        {/* View All Projects Central Button */}
-        <div className="text-center pt-8">
-          <a
-            href="https://github.com/jenitjenson45-debug?tab=repositories"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group inline-flex items-center gap-3 px-8 py-4 rounded-full bg-[#20231D] border border-[rgba(233,227,213,0.18)] hover:border-[#858D70] hover:bg-[#858D70]/20 text-[#E9E3D5] text-xs uppercase tracking-[0.25em] font-medium transition-all duration-300 shadow-xl"
-          >
-            <span>VIEW ALL PROJECTS ON GITHUB</span>
-            <ArrowUpRight className="w-4 h-4 text-[#858D70] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-          </a>
-        </div>
       </div>
 
-      {/* Deep-Dive Project Modal */}
+      {/* Full-Screen Project Detail Modal Overlay */}
       <ProjectModal
         project={selectedProject}
         onClose={() => setSelectedProject(null)}

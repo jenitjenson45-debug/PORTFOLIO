@@ -1,49 +1,57 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import "./globals.css";
 import { SmoothScroll } from "@/components/effects/SmoothScroll";
 import { CustomCursor } from "@/components/cursor/CustomCursor";
+import { GlobalProgressBar } from "@/components/common/GlobalProgressBar";
+import { CartProvider } from "@/context/CartContext";
+import { AuthProvider } from "@/context/AuthContext";
+import { ToastProvider } from "@/context/ToastContext";
+import { CulinaryParticles3D } from "@/components/effects/CulinaryParticles3D";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://portfolio-jenitjenson45-debug.vercel.app"),
-  title: "Jenit Jenson — Web Designer & UI/UX Designer",
+  title: "ZAFFRAN — The Grand Pavilion | Luxury Multi-Cuisine Dining & Online Ordering",
   description:
-    "Personal portfolio of Jenit Jenson: Web Designer and UI/UX Designer. Combining thoughtful aesthetics, intuitive interactions, and modern design systems.",
+    "Experience royal slow-smoked Yemeni Mandi, charcoal Arabic grills, traditional Malabar dum biryani, sizzling Asian woks, and handcrafted artisan beverages. Order online with live kitchen tracking.",
   keywords: [
-    "Jenit Jenson",
-    "Web Designer",
-    "UI/UX Designer",
-    "Digital Designer",
-    "Creative Web Designer",
-    "Portfolio 2026",
-    "Figma",
-    "Design Systems",
-    "Tailwind CSS",
+    "ZAFFRAN",
+    "Grand Pavilion",
+    "Multi-cuisine Restaurant",
+    "Mandi",
+    "Arabic Grills",
+    "Thalassery Biryani",
+    "Kerala Cuisine",
+    "Falooda",
+    "Mojitos",
+    "Online Food Ordering",
+    "Thrissur Dining",
+    "Mundur Restaurant",
+    "Jenit Jenson UI UX Design",
   ],
-  authors: [{ name: "Jenit Jenson" }],
-  creator: "Jenit Jenson",
+  authors: [{ name: "Jenit Jenson (UI/UX Designer & Architect)" }, { name: "ZAFFRAN Pavilion" }],
   openGraph: {
     type: "website",
-    locale: "en_US",
-    url: "https://github.com/jenitjenson45-debug",
-    title: "Jenit Jenson — Web Designer & UI/UX Designer",
+    locale: "en_IN",
+    title: "ZAFFRAN — The Grand Pavilion | Luxury Multi-Cuisine Dining",
     description:
-      "I design meaningful digital experiences through thoughtful UI/UX, modern design systems and creative interactions.",
-    siteName: "Jenit Jenson Portfolio",
+      "Royal Yemeni Mandi, charcoal Arabic skewers, authentic Malabar feasts, and artisan dessert lounges.",
+    siteName: "ZAFFRAN Restaurant",
     images: [
       {
-        url: "/images/jenit-portrait.jpg",
-        width: 800,
-        height: 1200,
-        alt: "Jenit Jenson Portrait",
+        url: "https://images.unsplash.com/photo-1633945274405-b6c8069047b0?w=1200&auto=format&fit=crop&q=80",
+        width: 1200,
+        height: 800,
+        alt: "ZAFFRAN Grand Multi-Cuisine Pavilion Feast",
       },
     ],
   },
-  twitter: {
-    card: "summary_large_image",
-    title: "Jenit Jenson — Digital Designer & Web Developer",
-    description:
-      "I design and develop meaningful digital experiences through thoughtful UI/UX, modern web technologies and creative interactions.",
-    images: ["/images/jenit-portrait.jpg"],
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    shortcut: "/favicon.svg",
+    apple: "/favicon.svg",
   },
 };
 
@@ -55,19 +63,38 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark scroll-smooth">
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover" />
+        <meta name="theme-color" content="#17110E" />
+        <link rel="preconnect" href="https://images.unsplash.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://images.unsplash.com" />
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Big+Shoulders+Display:wght@400;600;700;800;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700&family=Manrope:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,400;1,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap"
           rel="stylesheet"
         />
-        <link rel="icon" href="/favicon.svg" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="alternate icon" type="image/svg+xml" href="/icon.svg" />
+        <link rel="shortcut icon" href="/favicon.svg" />
+        <link rel="apple-touch-icon" href="/favicon.svg" />
       </head>
-      <body className="bg-[#11120F] text-[#E9E3D5] font-sans antialiased overflow-x-hidden selection:bg-[#858D70] selection:text-[#11120F]">
-        <SmoothScroll>
-          <CustomCursor />
-          {children}
-        </SmoothScroll>
+      <body className="bg-[#17110E] text-[#FFF4E5] font-sans antialiased overflow-x-hidden selection:bg-[#D99A43] selection:text-[#17110E]">
+        <Suspense fallback={null}>
+          <GlobalProgressBar />
+        </Suspense>
+        {/* 3D Culinary Particles & Restaurant Motion across entire website */}
+        <CulinaryParticles3D />
+        <AuthProvider>
+          <CartProvider>
+            <ToastProvider>
+              <SmoothScroll>
+                <CustomCursor />
+                {children}
+              </SmoothScroll>
+            </ToastProvider>
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   );
