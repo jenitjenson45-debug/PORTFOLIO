@@ -8,6 +8,7 @@ import { CartProvider } from "@/context/CartContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { ToastProvider } from "@/context/ToastContext";
 import { CulinaryParticles3D } from "@/components/effects/CulinaryParticles3D";
+import { PWAInstallPrompt } from "@/components/common/PWAInstallPrompt";
 
 export const metadata: Metadata = {
   title: "ZAFFRAN — The Grand Pavilion | Luxury Multi-Cuisine Dining & Online Ordering",
@@ -53,6 +54,12 @@ export const metadata: Metadata = {
     shortcut: "/favicon.svg",
     apple: "/favicon.svg",
   },
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "ZAFFRAN",
+  },
 };
 
 export default function RootLayout({
@@ -78,6 +85,12 @@ export default function RootLayout({
         <link rel="alternate icon" type="image/svg+xml" href="/icon.svg" />
         <link rel="shortcut icon" href="/favicon.svg" />
         <link rel="apple-touch-icon" href="/favicon.svg" />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="ZAFFRAN" />
+        <meta name="application-name" content="ZAFFRAN" />
       </head>
       <body className="bg-[#17110E] text-[#FFF4E5] font-sans antialiased overflow-x-hidden selection:bg-[#D99A43] selection:text-[#17110E]">
         <Suspense fallback={null}>
@@ -85,6 +98,8 @@ export default function RootLayout({
         </Suspense>
         {/* 3D Culinary Particles & Restaurant Motion across entire website */}
         <CulinaryParticles3D />
+        {/* PWA Install Prompt (Native App Experience for Mobile & Desktop) */}
+        <PWAInstallPrompt />
         <AuthProvider>
           <CartProvider>
             <ToastProvider>

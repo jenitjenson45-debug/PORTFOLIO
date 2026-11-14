@@ -1,0 +1,51 @@
+{
+  "name": "ZAFFRAN — The Grand Pavilion",
+  "short_name": "ZAFFRAN",
+  "description": "Royal Multi-Cuisine Dining & Online Ordering Destination in Mundur, Thrissur. Crafted by Jenit Jenson (UI/UX Architect).",
+  "start_url": "/",
+  "id": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "window-controls-overlay"],
+  "background_color": "#17110E",
+  "theme_color": "#17110E",
+  "orientation": "portrait-primary",
+  "categories": ["food", "shopping", "lifestyle"],
+  "shortcuts": [
+    {
+      "name": "Explore Menu",
+      "short_name": "Menu",
+      "description": "Browse 40+ royal dishes, mandi & grills",
+      "url": "/menu",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    },
+    {
+      "name": "View Cart",
+      "short_name": "Cart",
+      "description": "Check your selected delicacies",
+      "url": "/cart",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    },
+    {
+      "name": "Contact Concierge",
+      "short_name": "Concierge",
+      "description": "Mundur, Thrissur • +91 90721 04475",
+      "url": "/contact",
+      "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }]
+    }
+  ],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "48x48 72x72 96x96 128x128 144x144 192x192 256x256 384x384 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
